@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "./interfaces/IERC20.sol";
+import "./interfaces/IUniswapV2Pair.sol";
 
 contract BurnLiquidWithRouter {
     /**
@@ -20,6 +21,23 @@ contract BurnLiquidWithRouter {
 
     function burnLiquidityWithRouter(address pool, address usdc, address weth, uint256 deadline) public {
         // your code start here
+
+        uint256 usdcPoolBalance = IERC20(usdc).balanceOf(pool);
+        uint256 wethPoolBalance = IERC20(usdc).balanceOf(pool);
+
+        uint256 totalSupply = IUniswapV2Pair(pool).totalSupply();
+
+        uint256 myLiquidity = IUniswapV2Pair(pool).balanceOf(address(this));
+
+        // allow 5 % slippage
+        uint256 amountUsdcMin = usdcPoolBalance * myLiquidity * 95 / 100 / totalSupply;
+        uint256 amountWethMin = wethPoolBalance * myLiquidity * 95 / 100 / totalSupply;
+
+        IERC20(pool).approve(router, myLiquidity);
+
+        IUniswapV2Router(router).removeLiquidity(
+            usdc, weth, myLiquidity, amountUsdcMin, amountWethMin, address(this), deadline
+        );
     }
 }
 

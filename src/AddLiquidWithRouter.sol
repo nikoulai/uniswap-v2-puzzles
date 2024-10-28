@@ -3,6 +3,8 @@ pragma solidity ^0.8.13;
 
 import "./interfaces/IUniswapV2Pair.sol";
 
+import "./interfaces/IERC20.sol";
+
 contract AddLiquidWithRouter {
     /**
      *  ADD LIQUIDITY WITH ROUTER EXERCISE
@@ -20,6 +22,12 @@ contract AddLiquidWithRouter {
 
     function addLiquidityWithRouter(address usdcAddress, uint256 deadline) public {
         // your code start here
+
+        IERC20(usdcAddress).approve(router, address(this).balance);
+
+        IUniswapV2Router(router).addLiquidityETH{value: address(this).balance}(
+            usdcAddress, 1000 * 10 ** 6, 100 * 10 ** 6, 0.1 ether, msg.sender, deadline
+        );
     }
 
     receive() external payable {}

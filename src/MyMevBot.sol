@@ -30,12 +30,46 @@ contract MyMevBot {
 
     function performArbitrage() public {
         // your code here
+
+        // IUniswapV3Pool(flashLenderPool).flash(address(this), 10000 * 1e6, 1 * 1e18, "");
+        IUniswapV3Pool(flashLenderPool).flash(address(this), 10000 * 1e6, 0, "");
     }
 
     function uniswapV3FlashCallback(uint256 _fee0, uint256, bytes calldata data) external {
         callMeCallMe();
 
         // your code start here
+
+        address[] memory path = new address[](2);
+
+        uint256 amountToSwap = IERC20(usdc).balanceOf(address(this));
+        address;
+        path[0] = usdc;
+        path[1] = weth;
+
+        IERC20(usdc).approve(router, amountToSwap);
+        IUniswapV2Router(router).swapExactTokensForTokens(amountToSwap, 0, path, address(this), block.timestamp);
+
+        uint256 wethBalance = IERC20(weth).balanceOf(address(this));
+        path[0] = weth;
+        path[1] = usdt;
+
+        IERC20(weth).approve(router, wethBalance);
+        IUniswapV2Router(router).swapExactTokensForTokens(wethBalance, 0, path, address(this), block.timestamp);
+
+        uint256 usdtBalance = IERC20(usdt).balanceOf(address(this));
+        path[0] = usdt;
+        path[1] = usdc;
+
+        IERC20(usdt).approve(router, usdtBalance);
+        IUniswapV2Router(router).swapExactTokensForTokens(usdtBalance, 0, path, address(this), block.timestamp);
+
+        uint256 profit = IERC20(usdc).balanceOf(address(this));
+
+        uint256 amountOwed = amountToSwap + _fee0;
+        require(profit >= amountOwed, "No profit made");
+        IERC20(usdc).transfer(flashLenderPool, amountOwed);
+        require(IERC20(usdc).balanceOf(address(this)) > 0, "Arbitrage failed");
     }
 
     function callMeCallMe() private {

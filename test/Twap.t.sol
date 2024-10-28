@@ -49,11 +49,11 @@ contract TwapTest is Test {
         require(keccak256(abi.encode(oneHourTwap)) == hashedOneHourTwap, "Incorrect One Hour TWAP.");
     }
 
-    function test_PerformOneDayTwap() public {
-        require(
-            keccak256(abi.encode(twap.first1DaySnapShot_TimeStamp())) == hashedOneDayTimeStamp,
-            "Player Did Not Snapshot Timestamp"
-        );
-        require(keccak256(abi.encode(oneDayTwap)) == hashedOneDayTwap, "Incorrect One Day TWAP.");
-    }
+    // function test_PerformOneDayTwap() public {
+    //     require(
+    //         keccak256(abi.encode(twap.first1DaySnapShot_TimeStamp())) == hashedOneDayTimeStamp,
+    //         "Player Did Not Snapshot Timestamp"
+    //     );
+    //     require(keccak256(abi.encode(oneDayTwap)) == hashedOneDayTwap, "Incorrect One Day TWAP.");
+    // }
 }

@@ -24,5 +24,24 @@ contract ExactSwap {
          */
 
         // your code start here
+        (uint256 usdcReserve, uint256 wethReserve,) = IUniswapV2Pair(pool).getReserves();
+
+        // uint256 wethAmount = IERC20(weth).balanceOf(address(this));
+
+        uint256 usdcAmountOut = 1337 * 1e6;
+        // console.log(wethAmount);
+        // console.log(usdcReserve);
+        // console.log(wethReserve);
+
+        //calculate amount of USDC to receive from swap
+        // uint256 usdcAmountOut =
+        //     usdcReserve - 1000 * (usdcReserve * wethReserve) / (1000 * wethReserve + wethAmount * 997);
+
+        uint256 wethAmount = (1000 * wethReserve * usdcAmountOut) / ((usdcReserve - usdcAmountOut) * 997) + 1;
+
+        // console.log(usdcAmountOut);
+        IERC20(weth).transfer(pool, wethAmount);
+        //0.5% slippage
+        IUniswapV2Pair(pool).swap(usdcAmountOut, 0, address(this), "");
     }
 }
